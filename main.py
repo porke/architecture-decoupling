@@ -1,7 +1,7 @@
 import sys
 
 def main(args):
-    argument_pairs = filter(lambda str: not str, " ".join(args).split("--"))
+    argument_pairs = list(filter(lambda str: not str, " ".join(args).split("--")))
 
     # Identify the --task 
     # Parse the remaining args
