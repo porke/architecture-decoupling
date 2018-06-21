@@ -21,7 +21,7 @@ def extract_files(commit):
     return list(matches)
 
 def extract_connections(all_files, commit):            
-    commit_files = {f.replace(".", "_").replace("/", ".") for f in extract_files(commit)}
+    commit_files = {f for f in extract_files(commit)}    
     connections = [{"src" : all_files[src], "dest" : all_files[dest]} 
                         for src in commit_files 
                         for dest in commit_files 
@@ -33,7 +33,7 @@ def dump_to_json(output_path, files, connections):
         payload = {
             "@schema-version" : 1.0,
             "name:" : output_path.replace(".json", ""),
-            "variables" : [f.replace(".", "/").replace("_", ".") for f in files],
+            "variables" : [f for f in files],
             "cells" : connections
             }
         json.dump(payload, output_file)
@@ -52,7 +52,7 @@ def load_file_from_cytoscape_xml(path):
     for node in root.findall(".//*[@name='longName']"):
         file = node.get("value")        
         files.add(file)
-    return set({f.replace(".", "_").replace("/", ".") for f in files})
+    return files
 
 # The exported json files has the same format with the root being the root of the repository folder
 # Cytoscape has to have files in the following format: "tools/src/main/java/org/apache/pdfbox/tools/TextToPDF.java"
@@ -64,7 +64,6 @@ def convert_log(log_path, structure_path):
 
     structure_files = load_file_from_cytoscape_xml(structure_path)    
     print(str(len(structure_files)) + " structure files extracted")
-
     files = dict(zip(structure_files, range(0, len(structure_files))))
     connections = list(reduce(operator.add, filter(lambda xs: xs != [], [extract_connections(files, commit) for commit in commits]), []))
     cumulated_connections = cumulate_connections(connections)
@@ -72,6 +71,9 @@ def convert_log(log_path, structure_path):
 
     dump_to_json(log_path.replace("txt", "json"), files, cumulated_connections)
 
+# The tool converts a log git log obtained with: git log --numstat --date=iso > <repo-name>-log.txt
+# to a json file that can be imported to dv8 with dv8-console core:import-json-matrix -project <project> -depend <dep-file> <log>.json
+# it uses a cytoscape dependency matrix to exclude files which are not in the structural dependency graph
 def main(args):
     convert_log(args[0], args[1])
 

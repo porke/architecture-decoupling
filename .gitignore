@@ -107,3 +107,6 @@ venv.bak/
 *.txt
 *.json
 *.xml
+
+# user
+exported_data
