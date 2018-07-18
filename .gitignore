@@ -110,3 +110,4 @@ venv.bak/
 
 # user
 exported_data
+hotspot-detection/out
