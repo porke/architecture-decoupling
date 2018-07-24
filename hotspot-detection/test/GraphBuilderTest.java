@@ -10,7 +10,9 @@ public class GraphBuilderTest {
     }
 
     @org.junit.Test
-    public void buildGraph() {
+    public void buildGraphTest() {
+        String json = new GraphLoader().loadJson("jenkins.json");
+
         GraphBuilder gb = new GraphBuilder();
 
         Graph<String, DefaultEdge> stringDefaultEdgeGraph = gb.buildGraph("nanana!");

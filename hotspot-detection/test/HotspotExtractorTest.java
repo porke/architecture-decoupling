@@ -2,22 +2,31 @@ import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class HotspotExtractorTest {
     @org.junit.Test
-    public void extractType0HotspotTest() {
-        DirectedMultigraph<FileVertex, DependencyEdge> depGraph = createType0Hotspot();
+    public void extractInternalHotspotTestWithSingleHierarchy() {
+        DirectedMultigraph<FileVertex, DependencyEdge> depGraph = createInternalHotspotSingleHierarchy();
         HotspotExtractor he = new HotspotExtractor();
 
-        ArrayList<Hotspot> hotspots = he.extractHotspots(depGraph);
+        Set<Hotspot> hotspots = he.extractHotspots(depGraph);
     }
 
     @org.junit.Test
-    public void extractType1HotspotTest() {
+    public void extractInternalHotspotTestWithMultipleHierarchies() {
+        DirectedMultigraph<FileVertex, DependencyEdge> depGraph = createInternalHotspotDoubleHierarchy();
+        HotspotExtractor he = new HotspotExtractor();
+
+        Set<Hotspot> hotspots = he.extractHotspots(depGraph);
+    }
+
+    @org.junit.Test
+    public void extractExternalHotspotTest() {
         DirectedMultigraph<FileVertex, DependencyEdge> depGraph = createType1Hotspot();
         HotspotExtractor he = new HotspotExtractor();
 
-        ArrayList<Hotspot> hotspots = he.extractHotspots(depGraph);
+        Set<Hotspot> hotspots = he.extractHotspots(depGraph);
     }
 
     private DirectedMultigraph<FileVertex, DependencyEdge> createType1Hotspot() {
@@ -33,9 +42,7 @@ public class HotspotExtractorTest {
         files.put("InvalidAction.java", new FileVertex("InvalidAction.java"));
         files.put("ActionManagerFactory.java", new FileVertex("ActionManagerFactory.java"));
         DirectedMultigraph<FileVertex, DependencyEdge> depGraph = new DirectedMultigraph<>(DependencyEdge.class);
-        for (FileVertex v : files.values()) {
-            depGraph.addVertex(v);
-        }
+        files.values().forEach(depGraph::addVertex);
 
         addEdgeToGraph(depGraph, files, "SubmitAction.java", "AbstractActionManager.java", Relationship.Inheritance);
         addEdgeToGraph(depGraph, files, "UriAction.java", "AbstractActionManager.java", Relationship.Inheritance);
@@ -59,16 +66,14 @@ public class HotspotExtractorTest {
         return depGraph;
     }
 
-    private DirectedMultigraph<FileVertex, DependencyEdge> createType0Hotspot() {
+    private DirectedMultigraph<FileVertex, DependencyEdge> createInternalHotspotSingleHierarchy() {
         HashMap<String, FileVertex> files = new HashMap<>();
         DirectedMultigraph<FileVertex, DependencyEdge> depGraph = new DirectedMultigraph<>(DependencyEdge.class);
         files.put("LabelVisitor.java", new FileVertex("LabelVisitor.java"));
         files.put("Label.java", new FileVertex("Label.java"));
         files.put("LabelExpression.java", new FileVertex("LabelExpression.java"));
         files.put("LabelAtom.java", new FileVertex("LabelAtom.java"));
-        for (FileVertex v : files.values()) {
-            depGraph.addVertex(v);
-        }
+        files.values().forEach(depGraph::addVertex);
 
         addEdgeToGraph(depGraph, files, "Label.java", "LabelVisitor.java", Relationship.Type);
         addEdgeToGraph(depGraph, files,"LabelExpression.java", "LabelVisitor.java", Relationship.Type);
@@ -80,6 +85,20 @@ public class HotspotExtractorTest {
         addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelExpression.java", Relationship.Type);
         addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelAtom.java", Relationship.Type);
 
+        return depGraph;
+    }
+
+    private DirectedMultigraph<FileVertex, DependencyEdge> createInternalHotspotDoubleHierarchy() {
+        HashMap<String, FileVertex> files = new HashMap<>();
+        DirectedMultigraph<FileVertex, DependencyEdge> depGraph = new DirectedMultigraph<>(DependencyEdge.class);
+        files.put("A.java", new FileVertex("A.java"));
+        files.put("B.java", new FileVertex("B.java"));
+        files.put("C.java", new FileVertex("C.java"));
+        files.put("D.java", new FileVertex("D.java"));
+        files.values().forEach(depGraph::addVertex);
+
+        addEdgeToGraph(depGraph, files, "A.java", "B.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files,"C.java", "D.java", Relationship.Inheritance);
         return depGraph;
     }
 

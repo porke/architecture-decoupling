@@ -28,5 +28,6 @@
         <jarDirectory url="file://$MODULE_DIR$/lib/jgrapht" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="json" level="project" />
   </component>
 </module>
