@@ -6,4 +6,7 @@ public class FileVertex {
     }
 
     public String getPath() {return path;}
+
+    @Override
+    public String toString() {return path;}
 }

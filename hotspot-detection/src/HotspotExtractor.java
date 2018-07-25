@@ -1,5 +1,6 @@
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.Pseudograph;
 
 import java.util.HashSet;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class HotspotExtractor {
 
-    public Set<Hotspot> extractHotspots(DirectedMultigraph<FileVertex, DependencyEdge> dependencyGraph) {
+    public Set<Hotspot> extractHotspots(Pseudograph<FileVertex, DependencyEdge> dependencyGraph) {
         List<Set<FileVertex>> classHierarchies = extractClassHierarchies(dependencyGraph);
 
         Set<Hotspot> allHotspots = new HashSet<>();
@@ -17,7 +18,7 @@ public class HotspotExtractor {
         return allHotspots;
     }
 
-    private List<Set<FileVertex>> extractClassHierarchies(DirectedMultigraph<FileVertex, DependencyEdge> dependencyGraph) {
+    private List<Set<FileVertex>> extractClassHierarchies(Pseudograph<FileVertex, DependencyEdge> dependencyGraph) {
         Set<DependencyEdge> inheritanceEdges = dependencyGraph.edgeSet().stream()
                                                               .filter(e -> e.getDependencyType() == Relationship.Inheritance)
                                                               .collect(Collectors.toSet());
@@ -30,14 +31,82 @@ public class HotspotExtractor {
         inheritanceEdges.forEach(e -> inheritanceGraph.addEdge(e.getFrom(), e.getTo(), e));
 
         ConnectivityInspector<FileVertex, DependencyEdge> inspector = new ConnectivityInspector<>(inheritanceGraph);
-        return inspector.connectedSets();
+        List<Set<FileVertex>> hierarchies = inspector.connectedSets();
+        System.out.println("Extracted a total of " + hierarchies.size() + " class hierarchies");
+
+        return hierarchies;
     }
 
-    private Set<Hotspot> detectInternalHotspots(DirectedMultigraph<FileVertex, DependencyEdge> dependencyGraph, List<Set<FileVertex>> classHierarchies) {
-        return new HashSet<>();
+    private Set<Hotspot> detectInternalHotspots(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, List<Set<FileVertex>> classHierarchies) {
+        Set<Hotspot> ret = new HashSet<>();
+        for (Set<FileVertex> hierarchy : classHierarchies) {
+            Hotspot hotspot = detectInternalHotspotInHierarchy(dependencyGraph, hierarchy);
+            if (hotspot != null) {
+                ret.add(hotspot);
+            }
+        }
+
+        System.out.println("Detected " + ret.size() + " internal hotspots");
+        return ret;
     }
 
-    private Set<Hotspot> detectExternalHotspots(DirectedMultigraph<FileVertex, DependencyEdge> dependencyGraph, List<Set<FileVertex>> classHierarchies) {
-        return new HashSet<>();
+    private Hotspot detectInternalHotspotInHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> classes) {
+        Pseudograph<FileVertex, DependencyEdge> classGraph = constructHierarchy(dependencyGraph, classes, true);
+        // TODO:
+
+        return null;
+    }
+
+    private Set<Hotspot> detectExternalHotspots(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, List<Set<FileVertex>> classHierarchies) {
+        Set<Hotspot> ret = new HashSet<>();
+        for (Set<FileVertex> hierarchy : classHierarchies) {
+            Hotspot hotspot = detectExternalHotspotInHierarchy(dependencyGraph, hierarchy);
+            if (hotspot != null) {
+                ret.add(hotspot);
+            }
+        }
+
+        System.out.println("Detected " + ret.size() + " external hotspots");
+
+        return ret;
+    }
+
+    private Hotspot detectExternalHotspotInHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> hierarchyClasses) {
+        Pseudograph<FileVertex, DependencyEdge> hierarchyGraphWithClients = constructHierarchy(dependencyGraph, hierarchyClasses, false);
+
+        Set<FileVertex> clients = new HashSet<>(hierarchyGraphWithClients.vertexSet());
+        clients.removeAll(hierarchyClasses);
+
+        for (FileVertex client : clients) {
+            Set<FileVertex> clientToConnections = hierarchyGraphWithClients.edgesOf(client).stream().map(e -> e.getTo()).collect(Collectors.toSet());
+            if (clientToConnections.equals(hierarchyClasses)) {
+                return new Hotspot(hierarchyGraphWithClients);
+            }
+        }
+        return null;
+    }
+
+    private Pseudograph<FileVertex, DependencyEdge> constructHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> classes, boolean isInternal) {
+        Pseudograph<FileVertex, DependencyEdge> hierarchyGraph = new Pseudograph<>(DependencyEdge.class);
+        classes.forEach(hierarchyGraph::addVertex);
+        classes.forEach(c -> {
+            Set<DependencyEdge> allEdges = new HashSet<>();
+            allEdges.addAll(dependencyGraph.incomingEdgesOf(c));
+            allEdges.addAll(dependencyGraph.outgoingEdgesOf(c));
+            allEdges.forEach(e ->  {
+                if (isInternal) {
+                    if (classes.contains(e.getFrom()) && classes.contains(e.getTo())) {
+                        hierarchyGraph.addEdge(e.getFrom(), e.getTo(), e);
+                    }
+                }
+                else {
+                    hierarchyGraph.addVertex(e.getFrom());
+                    hierarchyGraph.addVertex(e.getTo());
+                    hierarchyGraph.addEdge(e.getFrom(), e.getTo(), e);
+                }
+            });
+        });
+
+        return hierarchyGraph;
     }
 }

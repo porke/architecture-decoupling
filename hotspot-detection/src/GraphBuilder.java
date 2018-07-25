@@ -1,12 +1,11 @@
-import org.jgrapht.graph.DirectedMultigraph;
-import org.jgrapht.graph.Pseudograph;
+import org.jgrapht.graph.WeightedPseudograph;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 public class GraphBuilder {
-    public Pseudograph<FileVertex, DependencyEdge> buildGraph(SATGraph input) {
-        Pseudograph<FileVertex, DependencyEdge> ret = new Pseudograph<>(DependencyEdge.class);
+    public WeightedPseudograph<FileVertex, DependencyEdge> buildGraph(SATGraph input) {
+        WeightedPseudograph<FileVertex, DependencyEdge> ret = new WeightedPseudograph<>(DependencyEdge.class);
 
         HashMap<String, FileVertex> vertices = new HashMap<>();
         input.getVertices().forEach(v -> {
@@ -34,11 +33,9 @@ public class GraphBuilder {
                 System.out.println("Weight is null");
             }
             else {
-                ret.addEdge(vertices.get(fromVertexName), vertices.get(toVertexName),
-                        new DependencyEdge(vertices.get(fromVertexName),
-                                vertices.get(toVertexName),
-                                relationshipFromString(depType),
-                                Integer.valueOf(weight)));
+                DependencyEdge newEdge = new DependencyEdge(vertices.get(fromVertexName), vertices.get(toVertexName), relationshipFromString(depType));
+                ret.addEdge(vertices.get(fromVertexName), vertices.get(toVertexName), newEdge);
+                ret.setEdgeWeight(newEdge, Integer.valueOf(weight));
             }
         });
 
