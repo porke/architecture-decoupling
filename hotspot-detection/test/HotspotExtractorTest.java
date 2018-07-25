@@ -23,10 +23,31 @@ public class HotspotExtractorTest {
     @org.junit.Test
     public void jenkinsHotspotTest() {
         SATGraph graph = new SATGraphLoader().loadJson("jenkins.json");
-        SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph);
+        SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "java");
 
         Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
         Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
+//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
+    }
+
+    @org.junit.Test
+    public void nunitHotspotTest() {
+        SATGraph graph = new SATGraphLoader().loadJson("nunit.json");
+        SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "csharp");
+
+        Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
+        Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
+//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
+    }
+
+    @org.junit.Test
+    public void dotnet_wcfHotspotTest() {
+        SATGraph graph = new SATGraphLoader().loadJson("dotnet_wcf.json");
+        SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "csharp");
+
+        Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
+        Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
+//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
     }
 
     private Pseudograph<FileVertex, DependencyEdge> createExternalHotspot() {
@@ -87,21 +108,6 @@ public class HotspotExtractorTest {
         addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelExpression.java", Relationship.Type);
         addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelAtom.java", Relationship.Type);
 
-        return depGraph;
-    }
-
-    private Pseudograph<FileVertex, DependencyEdge> createInternalHotspotDoubleHierarchy() {
-        HashMap<String, FileVertex> files = new HashMap<>();
-        Pseudograph<FileVertex, DependencyEdge> depGraph = new Pseudograph<>(DependencyEdge.class);
-
-        files.put("A.java", new FileVertex("A.java"));
-        files.put("B.java", new FileVertex("B.java"));
-        files.put("C.java", new FileVertex("C.java"));
-        files.put("D.java", new FileVertex("D.java"));
-        files.values().forEach(depGraph::addVertex);
-
-        addEdgeToGraph(depGraph, files, "B.java", "A.java", Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files,"D.java", "C.java", Relationship.Inheritance);
         return depGraph;
     }
 

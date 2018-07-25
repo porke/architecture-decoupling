@@ -47,9 +47,11 @@ public class GraphBuilder {
     private Relationship relationshipFromString(String relationship) {
         switch (relationship) {
             case "java.call":
+            case "csharp.call":
                 return Relationship.Call;
             case "java.implements":
             case "java.extends":
+            case "csharp.extends":
                 return Relationship.Inheritance;
         }
 

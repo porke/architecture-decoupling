@@ -21,6 +21,7 @@ public class HotspotExtractor {
     private List<Set<FileVertex>> extractClassHierarchies(Pseudograph<FileVertex, DependencyEdge> dependencyGraph) {
         Set<DependencyEdge> inheritanceEdges = dependencyGraph.edgeSet().stream()
                                                               .filter(e -> e.getDependencyType() == Relationship.Inheritance)
+                                                              .filter(e -> e.getTo() != e.getFrom())        // csharp allows inheriting outer classes and sat represents them with the same name
                                                               .collect(Collectors.toSet());
         Set<FileVertex> baseClasses = inheritanceEdges.stream().map(e -> e.getTo()).collect(Collectors.toSet());
         Set<FileVertex> derivedClasses = inheritanceEdges.stream().map(e -> e.getFrom()).collect(Collectors.toSet());
@@ -51,8 +52,18 @@ public class HotspotExtractor {
     }
 
     private Hotspot detectInternalHotspotInHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> classes) {
-        Pseudograph<FileVertex, DependencyEdge> classGraph = constructHierarchy(dependencyGraph, classes, true);
-        // TODO:
+        Pseudograph<FileVertex, DependencyEdge> internalHierarchyGraph = constructHierarchy(dependencyGraph, classes, true);
+        for (FileVertex c : classes) {
+            Set<DependencyEdge> edges = internalHierarchyGraph.edgesOf(c);
+            Set<FileVertex> childClasses = edges.stream()
+                                                .filter(e -> e.getFrom() == c && e.getDependencyType() == Relationship.Inheritance)
+                                                .map(e -> e.getFrom())
+                                                .collect(Collectors.toSet());
+            boolean cDependsOnChild = edges.stream().anyMatch(e -> childClasses.contains(e.getTo()));
+            if (cDependsOnChild) {
+                return new Hotspot(internalHierarchyGraph);
+            }
+        }
 
         return null;
     }
