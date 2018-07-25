@@ -1,28 +1,61 @@
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.graph.Pseudograph;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class GraphBuilder {
-    public Graph<String, DefaultEdge> buildGraph(String input) {
-        Graph<String, DefaultEdge> g = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+    public Pseudograph<FileVertex, DependencyEdge> buildGraph(SATGraph input) {
+        Pseudograph<FileVertex, DependencyEdge> ret = new Pseudograph<>(DependencyEdge.class);
 
-        String v1 = "v1";
-        String v2 = "v2";
-        String v3 = "v3";
-        String v4 = "v4";
+        HashMap<String, FileVertex> vertices = new HashMap<>();
+        input.getVertices().forEach(v -> {
+            String classPath = ((JSONObject)v).get("qualifiedName").toString();
+            FileVertex newVertex = new FileVertex(classPath);
+            vertices.put(classPath, newVertex);
+            ret.addVertex(newVertex);
+        });
 
-        // add the vertices
-        g.addVertex(v1);
-        g.addVertex(v2);
-        g.addVertex(v3);
-        g.addVertex(v4);
+        input.getEdges().forEach(e ->
+        {
+            JSONObject edge = (JSONObject)e;
+            String fromVertexName = edge.get("fromNodeQualifiedName").toString();
+            String toVertexName = edge.get("toNodeQualifiedName").toString();
+            String depType = edge.get("type").toString();
+            String weight = edge.get("weight").toString();
 
-        // add edges to create a circuit
-        g.addEdge(v1, v2);
-        g.addEdge(v2, v3);
-        g.addEdge(v3, v4);
-        g.addEdge(v4, v1);
+            if (!vertices.containsKey(fromVertexName)) {
+                System.out.println("Vertex missing: " + fromVertexName);
+            }
+            else if (!vertices.containsKey(toVertexName)) {
+                System.out.println("Vertex missing: " + fromVertexName);
+            }
+            else if (weight == null) {
+                System.out.println("Weight is null");
+            }
+            else {
+                ret.addEdge(vertices.get(fromVertexName), vertices.get(toVertexName),
+                        new DependencyEdge(vertices.get(fromVertexName),
+                                vertices.get(toVertexName),
+                                relationshipFromString(depType),
+                                Integer.valueOf(weight)));
+            }
+        });
 
-        return g;
+        System.out.println("Constructed a graph with " + ret.vertexSet().size() + " nodes and " + ret.edgeSet().size() + " edges");
+
+        return ret;
+    }
+
+    private Relationship relationshipFromString(String relationship) {
+        switch (relationship) {
+            case "java.call":
+                return Relationship.Call;
+            case "java.implements":
+            case "java.extends":
+                return Relationship.Inheritance;
+        }
+
+        return Relationship.Unknown;
     }
 }

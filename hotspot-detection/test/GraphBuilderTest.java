@@ -1,21 +1,15 @@
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-
-import static org.junit.Assert.*;
+import org.jgrapht.graph.Pseudograph;
+import org.junit.Assert;
 
 public class GraphBuilderTest {
-
-    @org.junit.Before
-    public void setUp() throws Exception {
-    }
-
     @org.junit.Test
     public void buildGraphTest() {
-        String json = new GraphLoader().loadJson("jenkins.json");
+        SATGraph graph = new SATGraphLoader().loadJson("jenkins.json");
+        SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph);
 
         GraphBuilder gb = new GraphBuilder();
-
-        Graph<String, DefaultEdge> stringDefaultEdgeGraph = gb.buildGraph("nanana!");
-        assertEquals(4, stringDefaultEdgeGraph.vertexSet().size());
+        Pseudograph<FileVertex, DependencyEdge> hotspotGraph = gb.buildGraph(sanitizedGraph);
+        Assert.assertEquals(sanitizedGraph.getEdges().length(), hotspotGraph.edgeSet().size());
+        Assert.assertEquals(sanitizedGraph.getVertices().length(), hotspotGraph.vertexSet().size());
     }
 }
