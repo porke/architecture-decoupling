@@ -1,3 +1,8 @@
+package hotspots.extraction;
+
+import hotspots.datamodel.DependencyEdge;
+import hotspots.datamodel.FileVertex;
+import hotspots.datamodel.Hotspot;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.graph.Pseudograph;
@@ -20,7 +25,7 @@ public class HotspotExtractor {
 
     private List<Set<FileVertex>> extractClassHierarchies(Pseudograph<FileVertex, DependencyEdge> dependencyGraph) {
         Set<DependencyEdge> inheritanceEdges = dependencyGraph.edgeSet().stream()
-                                                              .filter(e -> e.getDependencyType() == Relationship.Inheritance)
+                                                              .filter(e -> e.getDependencyType() == Hotspot.Relationship.Inheritance)
                                                               .filter(e -> e.getTo() != e.getFrom())        // csharp allows inheriting outer classes and sat represents them with the same name
                                                               .collect(Collectors.toSet());
         Set<FileVertex> baseClasses = inheritanceEdges.stream().map(e -> e.getTo()).collect(Collectors.toSet());
@@ -56,12 +61,17 @@ public class HotspotExtractor {
         for (FileVertex c : classes) {
             Set<DependencyEdge> edges = internalHierarchyGraph.edgesOf(c);
             Set<FileVertex> childClasses = edges.stream()
-                                                .filter(e -> e.getFrom() == c && e.getDependencyType() == Relationship.Inheritance)
+                                                .filter(e -> e.getFrom() == c && e.getDependencyType() == Hotspot.Relationship.Inheritance)
                                                 .map(e -> e.getFrom())
                                                 .collect(Collectors.toSet());
-            boolean cDependsOnChild = edges.stream().anyMatch(e -> childClasses.contains(e.getTo()));
-            if (cDependsOnChild) {
-                return new Hotspot(internalHierarchyGraph);
+            Set<DependencyEdge> violatingEdges = edges.stream().filter(e ->  e.getDependencyType() != Hotspot.Relationship.Inheritance
+                                                                        && e.getFrom() != e.getTo()
+                                                                        && childClasses.contains(e.getTo()))
+                                                                .collect(Collectors.toSet());
+            if (!violatingEdges.isEmpty()) {
+                // TODO: instead of returning on the first violation, detect all the violating edges
+                System.out.println(violatingEdges);
+                return new Hotspot(internalHierarchyGraph, violatingEdges, true);
             }
         }
 
@@ -84,14 +94,15 @@ public class HotspotExtractor {
 
     private Hotspot detectExternalHotspotInHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> hierarchyClasses) {
         Pseudograph<FileVertex, DependencyEdge> hierarchyGraphWithClients = constructHierarchy(dependencyGraph, hierarchyClasses, false);
-
         Set<FileVertex> clients = new HashSet<>(hierarchyGraphWithClients.vertexSet());
         clients.removeAll(hierarchyClasses);
 
         for (FileVertex client : clients) {
-            Set<FileVertex> clientToConnections = hierarchyGraphWithClients.edgesOf(client).stream().map(e -> e.getTo()).collect(Collectors.toSet());
+            Set<DependencyEdge> clientToHierarchyConnections = hierarchyGraphWithClients.edgesOf(client);
+            Set<FileVertex> clientToConnections = clientToHierarchyConnections.stream().map(e -> e.getTo()).collect(Collectors.toSet());
             if (clientToConnections.equals(hierarchyClasses)) {
-                return new Hotspot(hierarchyGraphWithClients);
+                // TODO: instead of returning on the first violation, detect all the violating edges
+                return new Hotspot(hierarchyGraphWithClients, clientToHierarchyConnections, false);
             }
         }
         return null;

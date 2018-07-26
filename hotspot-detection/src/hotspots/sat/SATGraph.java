@@ -1,3 +1,5 @@
+package hotspots.sat;
+
 import org.json.JSONArray;
 
 public class SATGraph {

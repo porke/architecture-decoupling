@@ -1,3 +1,5 @@
+package hotspots.datamodel;
+
 public class FileVertex {
     private String path;
 
@@ -7,6 +9,6 @@ public class FileVertex {
 
     public String getPath() {return path;}
 
-    @Override
+        @Override
     public String toString() {return path;}
 }

@@ -1,3 +1,8 @@
+package hotspots.sat;
+
+import hotspots.datamodel.DependencyEdge;
+import hotspots.datamodel.FileVertex;
+import hotspots.datamodel.Hotspot;
 import org.jgrapht.graph.WeightedPseudograph;
 import org.json.JSONObject;
 
@@ -44,17 +49,17 @@ public class GraphBuilder {
         return ret;
     }
 
-    private Relationship relationshipFromString(String relationship) {
+    private Hotspot.Relationship relationshipFromString(String relationship) {
         switch (relationship) {
             case "java.call":
             case "csharp.call":
-                return Relationship.Call;
+                return Hotspot.Relationship.Call;
             case "java.implements":
             case "java.extends":
             case "csharp.extends":
-                return Relationship.Inheritance;
+                return Hotspot.Relationship.Inheritance;
         }
 
-        return Relationship.Unknown;
+        return Hotspot.Relationship.Unknown;
     }
 }

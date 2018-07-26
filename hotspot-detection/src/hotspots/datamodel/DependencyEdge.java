@@ -1,9 +1,11 @@
+package hotspots.datamodel;
+
 public class DependencyEdge {
-    private Relationship dependencyType;
+    private Hotspot.Relationship dependencyType;
     private FileVertex from;
     private FileVertex to;
 
-    public DependencyEdge(FileVertex from, FileVertex to, Relationship dependencyType) {
+    public DependencyEdge(FileVertex from, FileVertex to, Hotspot.Relationship dependencyType) {
         this.from = from;
         this.to = to;
         this.dependencyType = dependencyType;
@@ -11,7 +13,7 @@ public class DependencyEdge {
 
     public FileVertex getFrom() {return from;}
     public FileVertex getTo() {return to;}
-    public Relationship getDependencyType() {return dependencyType;}
+    public Hotspot.Relationship getDependencyType() {return dependencyType;}
 
     @Override
     public String toString() {
