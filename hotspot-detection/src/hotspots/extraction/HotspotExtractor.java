@@ -3,6 +3,7 @@ package hotspots.extraction;
 import hotspots.datamodel.DependencyEdge;
 import hotspots.datamodel.FileVertex;
 import hotspots.datamodel.Hotspot;
+import hotspots.datamodel.Relationship;
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.jgrapht.graph.Pseudograph;
@@ -25,7 +26,7 @@ public class HotspotExtractor {
 
     private List<Set<FileVertex>> extractClassHierarchies(Pseudograph<FileVertex, DependencyEdge> dependencyGraph) {
         Set<DependencyEdge> inheritanceEdges = dependencyGraph.edgeSet().stream()
-                                                              .filter(e -> e.getDependencyType() == Hotspot.Relationship.Inheritance)
+                                                              .filter(e -> e.getDependencyType() == Relationship.Inheritance)
                                                               .filter(e -> e.getTo() != e.getFrom())        // csharp allows inheriting outer classes and sat represents them with the same name
                                                               .collect(Collectors.toSet());
         Set<FileVertex> baseClasses = inheritanceEdges.stream().map(e -> e.getTo()).collect(Collectors.toSet());
@@ -58,21 +59,22 @@ public class HotspotExtractor {
 
     private Hotspot detectInternalHotspotInHierarchy(Pseudograph<FileVertex, DependencyEdge> dependencyGraph, Set<FileVertex> classes) {
         Pseudograph<FileVertex, DependencyEdge> internalHierarchyGraph = constructHierarchy(dependencyGraph, classes, true);
+
+        Set<DependencyEdge> violatingEdges = new HashSet<>();
         for (FileVertex c : classes) {
             Set<DependencyEdge> edges = internalHierarchyGraph.edgesOf(c);
             Set<FileVertex> childClasses = edges.stream()
-                                                .filter(e -> e.getFrom() == c && e.getDependencyType() == Hotspot.Relationship.Inheritance)
+                                                .filter(e -> e.getFrom() == c && e.getDependencyType() == Relationship.Inheritance)
                                                 .map(e -> e.getFrom())
                                                 .collect(Collectors.toSet());
-            Set<DependencyEdge> violatingEdges = edges.stream().filter(e ->  e.getDependencyType() != Hotspot.Relationship.Inheritance
+            violatingEdges.addAll(edges.stream().filter(e ->  e.getDependencyType() != Relationship.Inheritance
                                                                         && e.getFrom() != e.getTo()
                                                                         && childClasses.contains(e.getTo()))
-                                                                .collect(Collectors.toSet());
-            if (!violatingEdges.isEmpty()) {
-                // TODO: instead of returning on the first violation, detect all the violating edges
-                System.out.println(violatingEdges);
-                return new Hotspot(internalHierarchyGraph, violatingEdges, true);
-            }
+                                                                .collect(Collectors.toSet()));
+        }
+
+        if (!violatingEdges.isEmpty()) {
+            return new Hotspot(internalHierarchyGraph, violatingEdges, true, classes);
         }
 
         return null;
@@ -97,14 +99,19 @@ public class HotspotExtractor {
         Set<FileVertex> clients = new HashSet<>(hierarchyGraphWithClients.vertexSet());
         clients.removeAll(hierarchyClasses);
 
+        Set<DependencyEdge> violatingEdges = new HashSet<>();
         for (FileVertex client : clients) {
             Set<DependencyEdge> clientToHierarchyConnections = hierarchyGraphWithClients.edgesOf(client);
             Set<FileVertex> clientToConnections = clientToHierarchyConnections.stream().map(e -> e.getTo()).collect(Collectors.toSet());
             if (clientToConnections.equals(hierarchyClasses)) {
-                // TODO: instead of returning on the first violation, detect all the violating edges
-                return new Hotspot(hierarchyGraphWithClients, clientToHierarchyConnections, false);
+                violatingEdges.addAll(clientToHierarchyConnections);
             }
         }
+
+        if (!violatingEdges.isEmpty()) {
+            return new Hotspot(hierarchyGraphWithClients, violatingEdges, false, hierarchyClasses);
+        }
+
         return null;
     }
 

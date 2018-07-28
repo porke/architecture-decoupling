@@ -1,6 +1,6 @@
 import hotspots.datamodel.DependencyEdge;
 import hotspots.datamodel.FileVertex;
-import hotspots.datamodel.Hotspot;
+import hotspots.datamodel.Relationship;
 import hotspots.extraction.HotspotExtractor;
 import hotspots.sat.GraphBuilder;
 import hotspots.sat.SATGraph;
@@ -9,7 +9,6 @@ import hotspots.sat.SATGraphSanitizer;
 import org.jgrapht.graph.Pseudograph;
 
 import java.util.HashMap;
-import java.util.Set;
 
 public class HotspotExtractorTest {
     @org.junit.Test
@@ -17,7 +16,7 @@ public class HotspotExtractorTest {
         Pseudograph<FileVertex, DependencyEdge> depGraph = createInternalHotspotSingleHierarchy();
         HotspotExtractor he = new HotspotExtractor();
 
-        Set<Hotspot> hotspots = he.extractHotspots(depGraph);
+        System.out.println(he.extractHotspots(depGraph));
     }
 
     @org.junit.Test
@@ -25,7 +24,7 @@ public class HotspotExtractorTest {
         Pseudograph<FileVertex, DependencyEdge> depGraph = createExternalHotspot();
         HotspotExtractor he = new HotspotExtractor();
 
-        Set<Hotspot> hotspots = he.extractHotspots(depGraph);
+        System.out.println(he.extractHotspots(depGraph));
     }
 
     @org.junit.Test
@@ -34,8 +33,7 @@ public class HotspotExtractorTest {
         SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "java");
 
         Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
-        Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
-//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
+        System.out.println(new HotspotExtractor().extractHotspots(hotspotGraph));
     }
 
     @org.junit.Test
@@ -44,8 +42,7 @@ public class HotspotExtractorTest {
         SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "csharp");
 
         Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
-        Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
-//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
+        System.out.println(new HotspotExtractor().extractHotspots(hotspotGraph));
     }
 
     @org.junit.Test
@@ -54,8 +51,7 @@ public class HotspotExtractorTest {
         SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "csharp");
 
         Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
-        Set<Hotspot> hotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
-//        hotspots.forEach(g -> System.out.println(g.getGraph().vertexSet()));
+        System.out.println(new HotspotExtractor().extractHotspots(hotspotGraph));
     }
 
     private Pseudograph<FileVertex, DependencyEdge> createExternalHotspot() {
@@ -74,24 +70,24 @@ public class HotspotExtractorTest {
         Pseudograph<FileVertex, DependencyEdge> depGraph = new Pseudograph<>(DependencyEdge.class);
         files.values().forEach(depGraph::addVertex);
 
-        addEdgeToGraph(depGraph, files, "SubmitAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "UriAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "NamedAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "HideAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "ThreadAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "GoToAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "InvalidAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files, "UndefAction.java", "AbstractActionManager.java", Hotspot.Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "SubmitAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "UriAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "NamedAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "HideAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "ThreadAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "GoToAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "InvalidAction.java", "AbstractActionManager.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files, "UndefAction.java", "AbstractActionManager.java", Relationship.Inheritance);
 
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "AbstractActionManager.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "SubmitAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "UriAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "NamedAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "HideAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "ThreadAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "GoToAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "InvalidAction.java", Hotspot.Relationship.Call);
-        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "UndefAction.java", Hotspot.Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "AbstractActionManager.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "SubmitAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "UriAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "NamedAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "HideAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "ThreadAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "GoToAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "InvalidAction.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files, "ActionManagerFactory.java", "UndefAction.java", Relationship.Call);
 
         return depGraph;
     }
@@ -106,20 +102,20 @@ public class HotspotExtractorTest {
         files.put("LabelAtom.java", new FileVertex("LabelAtom.java"));
         files.values().forEach(depGraph::addVertex);
 
-        addEdgeToGraph(depGraph, files, "Label.java", "LabelVisitor.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"LabelExpression.java", "LabelVisitor.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"LabelAtom.java", "LabelVisitor.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"LabelExpression.java", "Label.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files,"LabelAtom.java", "Label.java", Hotspot.Relationship.Inheritance);
-        addEdgeToGraph(depGraph, files,"Label.java", "LabelExpression.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"Label.java", "LabelAtom.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelExpression.java", Hotspot.Relationship.Type);
-        addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelAtom.java", Hotspot.Relationship.Type);
+        addEdgeToGraph(depGraph, files, "Label.java", "LabelVisitor.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"LabelExpression.java", "LabelVisitor.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"LabelAtom.java", "LabelVisitor.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"LabelExpression.java", "Label.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files,"LabelAtom.java", "Label.java", Relationship.Inheritance);
+        addEdgeToGraph(depGraph, files,"Label.java", "LabelExpression.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"Label.java", "LabelAtom.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelExpression.java", Relationship.Call);
+        addEdgeToGraph(depGraph, files,"LabelVisitor.java", "LabelAtom.java", Relationship.Call);
 
         return depGraph;
     }
 
-    private void addEdgeToGraph(Pseudograph<FileVertex, DependencyEdge> depGraph, HashMap<String, FileVertex> files, String from, String to, Hotspot.Relationship rel) {
+    private void addEdgeToGraph(Pseudograph<FileVertex, DependencyEdge> depGraph, HashMap<String, FileVertex> files, String from, String to, Relationship rel) {
         depGraph.addEdge(
                 files.get(from),
                 files.get(to),
