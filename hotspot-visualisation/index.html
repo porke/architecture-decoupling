@@ -42,50 +42,50 @@ path.invis {
     <!-- var data = { -->
           <!-- edges: [ -->
               <!-- { -->
-                <!-- source: {id: 0, label: "Parent", isSuperClass: true}, -->
-                <!-- target: {id: 1, label: "ChildA", isSuperClass: true}, -->
+                <!-- source: {id: 0, label: "Parent", type: "super"}, -->
+                <!-- target: {id: 1, label: "ChildA", type: "super"}, -->
                 <!-- value: "Dependency", -->
 				<!-- violation: true, -->
               <!-- }, -->
 			  <!-- { -->
-                <!-- source: {id: 1, label: "Parent", isSuperClass: true}, -->
-                <!-- target: {id: 0, label: "ChildA", isSuperClass: true}, -->
+                <!-- source: {id: 1, label: "Parent", type: "super"}, -->
+                <!-- target: {id: 0, label: "ChildA", type: "super"}, -->
                 <!-- value: "Inheritance", -->
 				<!-- violation: false -->
               <!-- }, -->
 			  <!-- { -->
-                <!-- source: {id: 2, label: "ChildB", isSuperClass: false}, -->
-                <!-- target: {id: 0, label: "Parent", isSuperClass: true}, -->
+                <!-- source: {id: 2, label: "ChildB", type: "base"}, -->
+                <!-- target: {id: 0, label: "Parent", type: "client"}, -->
                 <!-- value: "Inheritance", -->
 				<!-- violation: false -->
               <!-- }, -->
 			  <!-- { -->
-                <!-- source: {id: 3, label: "ChildC", isSuperClass: false}, -->
-                <!-- target: {id: 1, label: "ChildA", isSuperClass: true}, -->
+                <!-- source: {id: 3, label: "ChildC", type: "client"}, -->
+                <!-- target: {id: 1, label: "ChildA", type: "super"}, -->
                 <!-- value: "Inheritance", -->
 				<!-- violation: false -->
               <!-- }, -->
 			  <!-- { -->
-                <!-- source: {id: 1, label: "ChildA", isSuperClass: true}, -->
-                <!-- target: {id: 3, label: "ChildC", isSuperClass: false}, -->
+                <!-- source: {id: 1, label: "ChildA", type: "super"}, -->
+                <!-- target: {id: 3, label: "ChildC", type: "client"}, -->
                 <!-- value: "Dependency", -->
 				<!-- violation: true -->
               <!-- }, -->
 			  <!-- { -->
-                <!-- source: {id: 0, label: "Parent", isSuperClass: true}, -->
-                <!-- target: {id: 3, label: "ChildC", isSuperClass: false}, -->
+                <!-- source: {id: 0, label: "Parent", type: "super"}, -->
+                <!-- target: {id: 3, label: "ChildC", type: "client"}, -->
                 <!-- value: "Dependency", -->
 				<!-- violation: true -->
               <!-- } -->
           <!-- ] -->
     <!-- }; -->
 
-	var data = {"edges":[{"violation":false,"source":{"isSuperClass":true,"id":0,"label":"InvalidAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":0,"label":"InvalidAction.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":3,"label":"UriAction.java"}},{"violation":false,"source":{"isSuperClass":true,"id":3,"label":"UriAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":4,"label":"HideAction.java"}},{"violation":false,"source":{"isSuperClass":true,"id":4,"label":"HideAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":false,"source":{"isSuperClass":true,"id":5,"label":"GoToAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":5,"label":"GoToAction.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":6,"label":"NamedAction.java"}},{"violation":false,"source":{"isSuperClass":true,"id":6,"label":"NamedAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":false,"source":{"isSuperClass":true,"id":7,"label":"SubmitAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":7,"label":"SubmitAction.java"}},{"violation":false,"source":{"isSuperClass":true,"id":8,"label":"UndefAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":8,"label":"UndefAction.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":true,"id":9,"label":"ThreadAction.java"}},{"violation":false,"source":{"isSuperClass":true,"id":9,"label":"ThreadAction.java"},"value":"Inheritance","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}},{"violation":true,"source":{"isSuperClass":false,"id":2,"label":"ActionManagerFactory.java"},"value":"Call","target":{"isSuperClass":false,"id":1,"label":"AbstractActionManager.java"}}]}
+	var data = {"edges":[{"violation":false,"source":{"id":0,"label":"InvalidAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":0,"label":"InvalidAction.java","type":"base"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":3,"label":"UriAction.java","type":"base"}},{"violation":false,"source":{"id":3,"label":"UriAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":4,"label":"HideAction.java","type":"base"}},{"violation":false,"source":{"id":4,"label":"HideAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":false,"source":{"id":5,"label":"GoToAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":5,"label":"GoToAction.java","type":"base"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":6,"label":"NamedAction.java","type":"base"}},{"violation":false,"source":{"id":6,"label":"NamedAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":false,"source":{"id":7,"label":"SubmitAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":7,"label":"SubmitAction.java","type":"base"}},{"violation":false,"source":{"id":8,"label":"UndefAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":8,"label":"UndefAction.java","type":"base"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":9,"label":"ThreadAction.java","type":"base"}},{"violation":false,"source":{"id":9,"label":"ThreadAction.java","type":"base"},"value":"Inheritance","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}},{"violation":true,"source":{"id":2,"label":"ActionManagerFactory.java","type":"client"},"value":"Call","target":{"id":1,"label":"AbstractActionManager.java","type":"super"}}]}
 	
     function myGraph() {
       this.addNode = function (n) {		  
           if (!findNode(n.id)) {
-              nodes.push({"id": n.id, "label": n.label, "isSuperClass" : n.isSuperClass});
+              nodes.push({"id": n.id, "label": n.label, "type" : n.type});
               update();
           }
       };
@@ -232,7 +232,9 @@ path.invis {
                         .attr("class", "nodeStrokeClass")
                         .attr("fill", function(d) {		
 							// TODO: Note superclass customization
-							return d.isSuperClass ? "#ff00ff" : "#0db7ed";
+								if (d.type === "super") return "#ff00ff";
+								else if (d.type === "client") return "#00ff00";
+								else if (d.type === "base") return "#0db7ed";								
 							});
 
                 nodeEnter.append("svg:text")

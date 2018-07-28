@@ -74,13 +74,13 @@ public class Hotspot {
             JSONObject fromVertexObject = new JSONObject();
             fromVertexObject.put("id", vertexIds.get(e.getFrom().getPath()));
             fromVertexObject.put("label", e.getFrom().getPath());
-            fromVertexObject.put("isSuperClass", e.getFrom().getVertexType() == VertexType.BaseClass);
+            fromVertexObject.put("type", e.getFrom().getVertexType().toString());
             edgeObject.put("source", fromVertexObject);
 
             JSONObject toVertexObject = new JSONObject();
             toVertexObject.put("id", vertexIds.get(e.getTo().getPath()));
             toVertexObject.put("label", e.getTo().getPath());
-            toVertexObject.put("isSuperClass", e.getTo().getVertexType() == VertexType.BaseClass);
+            toVertexObject.put("type", e.getTo().getVertexType().toString());
             edgeObject.put("target", toVertexObject);
 
             edgesArray.put(edgeObject);
