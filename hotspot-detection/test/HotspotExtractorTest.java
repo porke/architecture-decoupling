@@ -1,7 +1,9 @@
 import hotspots.datamodel.DependencyEdge;
 import hotspots.datamodel.FileVertex;
+import hotspots.datamodel.Hotspot;
 import hotspots.datamodel.Relationship;
 import hotspots.extraction.HotspotExtractor;
+import hotspots.extraction.HotspotFileSerializer;
 import hotspots.sat.GraphBuilder;
 import hotspots.sat.SATGraph;
 import hotspots.sat.SATGraphLoader;
@@ -9,6 +11,7 @@ import hotspots.sat.SATGraphSanitizer;
 import org.jgrapht.graph.Pseudograph;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class HotspotExtractorTest {
     @org.junit.Test
@@ -24,7 +27,9 @@ public class HotspotExtractorTest {
         Pseudograph<FileVertex, DependencyEdge> depGraph = createExternalHotspot();
         HotspotExtractor he = new HotspotExtractor();
 
-        System.out.println(he.extractHotspots(depGraph));
+        Set<Hotspot> extractedHotspots = he.extractHotspots(depGraph);
+        System.out.println(extractedHotspots);
+        new HotspotFileSerializer().outputHotspotFiles(extractedHotspots, "extractExternalHotspotTest-hotspots.json");
     }
 
     @org.junit.Test
@@ -33,7 +38,9 @@ public class HotspotExtractorTest {
         SATGraph sanitizedGraph = new SATGraphSanitizer().sanitize(graph, "java");
 
         Pseudograph<FileVertex, DependencyEdge> hotspotGraph = new GraphBuilder().buildGraph(sanitizedGraph);
-        System.out.println(new HotspotExtractor().extractHotspots(hotspotGraph));
+        Set<Hotspot> extractedHotspots = new HotspotExtractor().extractHotspots(hotspotGraph);
+        System.out.println(extractedHotspots);
+        new HotspotFileSerializer().outputHotspotFiles(extractedHotspots, "jenkinsHotspotTest-hotspots.json");
     }
 
     @org.junit.Test

@@ -5,8 +5,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class Hotspot {
@@ -30,6 +32,8 @@ public class Hotspot {
     public Set<DependencyEdge> getViolatingEdges() {return violatingEdges;}
 
     public boolean isInternal() {return isInternal;}
+
+    public Set<FileVertex> getViolatingFiles() {return this.graph.vertexSet(); }
 
     private void markVertexTypes(Set<FileVertex> classHierarchy) {
         graph.vertexSet().forEach(v -> {
